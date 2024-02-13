@@ -1,5 +1,12 @@
+import argparse
+import logging
 from textblob import TextBlob
 from dataclasses import dataclass
+
+# Constants for emojis
+POSITIVE_EMOJI = '😊'
+NEGATIVE_EMOJI = '😒'
+NEUTRAL_EMOJI = '😐'
 
 
 @dataclass
@@ -9,24 +16,42 @@ class Mood:
     sentiment: float
 
 
+def get_sentiment(input_text: str) -> float:
+    """Calculate the sentiment polarity of the input text."""
+    try:
+        return TextBlob(input_text).sentiment.polarity
+    except Exception as e:
+        logging.error(f"Failed to calculate sentiment: {e}")
+        raise
+
+
 def get_mood(input_text: str, *, threshold: float) -> Mood:
     """Analyze the sentiment of the input text and return the corresponding mood."""
-    try:
-        sentiment = TextBlob(input_text).sentiment.polarity  # type: ignore
-    except Exception as e:
-        raise ValueError("Failed to analyze sentiment") from e
+    sentiment = get_sentiment(input_text)
 
     if sentiment >= threshold:
-        return Mood('😊', sentiment)
+        return Mood(POSITIVE_EMOJI, sentiment)
     elif sentiment <= -threshold:
-        return Mood('😒', sentiment)
+        return Mood(NEGATIVE_EMOJI, sentiment)
     else:
-        return Mood('😐', sentiment)
+        return Mood(NEUTRAL_EMOJI, sentiment)
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description='Analyze text sentiment and display mood.')
+    parser.add_argument('--text', help='Input text to analyze.')
+    parser.add_argument('--threshold', type=float, default=0.3,
+                        help='Threshold for sentiment analysis.')
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
+    text = args.text or input('Text: ')
+    mood = get_mood(text, threshold=args.threshold)
+    print(f'{mood.emoji} ({mood.sentiment})')
 
 
 if __name__ == '__main__':
-    while True:
-        text: str = input('Text: ')
-        mood: Mood = get_mood(text, threshold=0.3)
-
-        print(f'{mood.emoji} ({mood.sentiment})')
+    main()
