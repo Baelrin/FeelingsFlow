@@ -27,6 +27,8 @@ def get_sentiment(input_text: str) -> float:
 
 def get_mood(input_text: str, *, threshold: float) -> Mood:
     """Analyze the sentiment of the input text and return the corresponding mood."""
+    if not input_text:
+        raise ValueError("Input text cannot be empty.")
     sentiment = get_sentiment(input_text)
 
     if sentiment >= threshold:

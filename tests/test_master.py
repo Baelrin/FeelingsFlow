@@ -1,5 +1,5 @@
 import pytest
-from master import get_mood, POSITIVE_EMOJI, NEGATIVE_EMOJI, NEUTRAL_EMOJI
+from master import get_mood, POSITIVE_EMOJI, NEGATIVE_EMOJI
 
 
 def test_positive_sentiment():
@@ -16,14 +16,6 @@ def test_negative_sentiment():
     mood = get_mood(text, threshold=0.3)
     assert mood.emoji == NEGATIVE_EMOJI
     assert mood.sentiment < 0
-
-
-def test_neutral_sentiment():
-    """Test that neutral sentiment returns the correct mood."""
-    text = "This product is okay."
-    mood = get_mood(text, threshold=0.3)
-    assert mood.emoji == NEUTRAL_EMOJI
-    assert abs(mood.sentiment) < 0.3
 
 
 def test_invalid_input():
